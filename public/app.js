@@ -70,7 +70,7 @@ function draw() {
             charMove();
         }
         socket.on("data", function(obj){
-            console.log(obj);
+            // console.log(obj);
             drawPaint(obj);
         }) 
     // }
