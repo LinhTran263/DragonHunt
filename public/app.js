@@ -9,14 +9,11 @@ function setup() {
     let canvas = createCanvas(windowWidth, windowHeight);
     canvas.parent("game_container");
 
-    socket.on("data", function(obj){
-        console.log(obj);
-        drawPaint(obj);
-    })
+    
   }
 
 // window.addEventListener("load", ()=>{
-    
+       
 // })
 let charX=200;
 let charY=200;
@@ -72,6 +69,10 @@ function draw() {
             charDirection = 2;
             charMove();
         }
+        socket.on("data", function(obj){
+            console.log(obj);
+            drawPaint(obj);
+        }) 
     // }
     ellipse(charX,charY,d);
     ellipse(200,200,d);
@@ -85,13 +86,15 @@ function charDragged() {
         y : charY
     };
     socket.emit('data',charObj);
-    console.log(charX);
-    console.log(charY);
+    // console.log(charX);
+    // console.log(charY);
 }
 
 function drawPaint(data) {
-    console.log(data);
+    // console.log(data);
     fill(0);
     ellipse(data.x, data.y, d);
+    charX = data.x;
+    charY = data.y;
     // stroke(255);
 }
