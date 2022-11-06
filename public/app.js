@@ -8,6 +8,7 @@ socket.on("connect", ()=>{
 function setup() {
     let canvas = createCanvas(windowWidth, windowHeight);
     canvas.parent("game_container");
+<<<<<<< Updated upstream
   }
 
 
@@ -33,3 +34,14 @@ function draw() {
     }
     ellipse(x,y,d);
 }
+=======
+}
+  
+function draw() {
+    background(220);
+}
+
+socket.on("connect", ()=>{
+    console.log("Connection established to server via socket");
+});
+>>>>>>> Stashed changes
