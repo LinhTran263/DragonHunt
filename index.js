@@ -21,12 +21,15 @@ io = new io.Server(server);
 //when socket is connected
 io.sockets.on("connect", (socket)=>{
     console.log("New Connection: ", socket.id);
+
+    socket.on("data", function(data) {
+        console.log(data);
+        io.sockets.emit("data",data);
+    });
     //when socket is disconneted
     socket.on("disconnect", ()=>{
         console.log("Socket Disconnected: ", socket.id)
-    })
-    socket.on("charData", (data) => {
-        io.sockets.emit("serverData",data);
-    })
-})
+    });
+    
+});
 

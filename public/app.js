@@ -1,6 +1,6 @@
 let socket = io();
 
-socket.on("connect", ()=>{
+socket.on("connect", function(){
     console.log("Connection established to server via socket");
 });
 
@@ -8,13 +8,16 @@ socket.on("connect", ()=>{
 function setup() {
     let canvas = createCanvas(windowWidth, windowHeight);
     canvas.parent("game_container");
+
+    socket.on("data", function(obj){
+        console.log(obj);
+        drawPaint(obj);
+    })
   }
 
-window.addEventListener("load", ()=>{
-    socket.on("serverData", (data)=>{
-        drawPaint(data);
-    })
-})
+// window.addEventListener("load", ()=>{
+    
+// })
 let charX=200;
 let charY=200;
 let d=40;
@@ -24,7 +27,7 @@ let yspeed = 5;
 
 let charDirection = 1;
 
-function move() {
+function charMove() {
     if (charDirection ==0) {
         if (charY < windowHeight) {
             charY += yspeed;
@@ -45,6 +48,8 @@ function move() {
             charX -= xspeed;
         }
     }
+    // console.log(charX, charY);
+    charDragged();
 }
   
 function draw() {
@@ -53,33 +58,40 @@ function draw() {
     // if (keyIsDown) {
         if (keyIsDown(DOWN_ARROW)|| key == 's') {
             charDirection = 0;
-            move();
+            charMove();
         }
         if (keyIsDown(LEFT_ARROW)|| key == 'a') {
             charDirection = 3;
-            move();
+            charMove();
         }
         if (keyIsDown(RIGHT_ARROW)|| key == 'd') {
             charDirection = 1;
-            move();
+            charMove();
         }
         if (keyIsDown(UP_ARROW)|| key == 'w') {
             charDirection = 2;
-            move();
+            charMove();
         }
     // }
     ellipse(charX,charY,d);
+    ellipse(200,200,d);
+
 }
+// console.log(charX,charY);
 
 function charDragged() {
     let charObj = {
         x : charX,
         y : charY
-    }
-    socket.emit('charData',charObj);
+    };
+    socket.emit('data',charObj);
+    console.log(charX);
+    console.log(charY);
 }
 
 function drawPaint(data) {
+    console.log(data);
+    fill(0);
     ellipse(data.x, data.y, d);
-    stroke(255);
+    // stroke(255);
 }
