@@ -1,3 +1,8 @@
 body{
     background-color: lightblue;
+    margin: 0;
+}
+
+#game_container{
+    margin: 0;
 }
