@@ -50,24 +50,24 @@ function move() {
 function draw() {
     background(220);
     
-    if (keyIsPressed) {
-        if (keyCode == DOWN_ARROW|| key == 's') {
+    // if (keyIsDown) {
+        if (keyIsDown(DOWN_ARROW)|| key == 's') {
             charDirection = 0;
             move();
         }
-        else if (keyCode == LEFT_ARROW|| key == 'a') {
+        if (keyIsDown(LEFT_ARROW)|| key == 'a') {
             charDirection = 3;
             move();
         }
-        else if (keyCode == RIGHT_ARROW|| key == 'd') {
+        if (keyIsDown(RIGHT_ARROW)|| key == 'd') {
             charDirection = 1;
             move();
         }
-        else if (keyCode == UP_ARROW|| key == 'w') {
+        if (keyIsDown(UP_ARROW)|| key == 'w') {
             charDirection = 2;
             move();
         }
-    }
+    // }
     ellipse(charX,charY,d);
 }
 
