@@ -16,12 +16,17 @@ server.listen(3000, ()=>{
 let io = require("socket.io");
 io = new io.Server(server);
 
+
+
 //when socket is connected
 io.sockets.on("connect", (socket)=>{
     console.log("New Connection: ", socket.id);
     //when socket is disconneted
     socket.on("disconnect", ()=>{
         console.log("Socket Disconnected: ", socket.id)
+    })
+    socket.on("charData", (data) => {
+        io.sockets.emit("serverData",data);
     })
 })
 
