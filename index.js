@@ -23,7 +23,7 @@ io.sockets.on("connect", (socket)=>{
     console.log("New Connection: ", socket.id);
 
     socket.on("data", function(data) {
-        console.log(data);
+        // console.log(data);
         io.sockets.emit("data",data);
     });
     //when socket is disconneted

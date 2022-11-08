@@ -4,11 +4,26 @@ socket.on("connect", function(){
     console.log("Connection established to server via socket");
 });
 
-
+function setParentToCanvas(item) {
+    item.parentNode("canvas");
+}
+function setParent(element, newParent) {
+    newParent.appendChild(element);
+}
 function setup() {
     let canvas = createCanvas(windowWidth, windowHeight);
+    canvas.id = "canvas";
     canvas.parent("game_container");
-
+    
+    let grids = document.getElementsByClassName("grid-block");
+    // for each let i in grids) {
+    //     grids[i].parent("canvas");
+    // }
+    // grids.forEach(setParentToCanvas);
+    for (i in grids) {
+        setParent(grids[i],document.getElementById("canvas"));
+    }
+    // grids.forEach(setParentToCanvas);
     
   }
 
@@ -57,15 +72,15 @@ function draw() {
             charDirection = 0;
             charMove();
         }
-        if (keyIsDown(LEFT_ARROW)|| key == 'a') {
+        else if (keyIsDown(LEFT_ARROW)|| key == 'a') {
             charDirection = 3;
             charMove();
         }
-        if (keyIsDown(RIGHT_ARROW)|| key == 'd') {
+        else if (keyIsDown(RIGHT_ARROW)|| key == 'd') {
             charDirection = 1;
             charMove();
         }
-        if (keyIsDown(UP_ARROW)|| key == 'w') {
+        else if (keyIsDown(UP_ARROW)|| key == 'w') {
             charDirection = 2;
             charMove();
         }
