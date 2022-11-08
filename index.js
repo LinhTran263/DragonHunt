@@ -2,6 +2,7 @@
 let express = require("express");
 let app = express();
 app.use("/", express.static("public"))
+let playerCount = 0;
 
 
 //creating an http server ON the express app
@@ -21,14 +22,25 @@ io = new io.Server(server);
 //when socket is connected
 io.sockets.on("connect", (socket)=>{
     console.log("New Connection: ", socket.id);
+    playerCount++;
+    console.log("Player Count: ", playerCount);
 
-    socket.on("data", function(data) {
-        // console.log(data);
-        io.sockets.emit("data",data);
-    });
+    // let playerNo = {
+    //     number: playerNumber
+    // }
+    // socket.emit("playerJoin",playerNo);
+    if (playerCount <= 2) {
+        socket.on("clientData", function(data) {
+            // console.log(data);
+            io.sockets.emit("serverData",data);
+        });
+    }
+    
     //when socket is disconneted
     socket.on("disconnect", ()=>{
-        console.log("Socket Disconnected: ", socket.id)
+        console.log("Socket Disconnected: ", socket.id);
+        playerCount--;
+        console.log("Player Count: ", playerCount);
     });
     
 });

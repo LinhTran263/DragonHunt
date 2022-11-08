@@ -2,6 +2,66 @@ let socket = io();
 let canvasWidth = 512;
 let canvasHeight = 512;
 
+let char1X=32;
+let char1Y=32;
+let char2X=480;
+let char2Y=480;
+let d=40;
+
+let xspeed = 15;
+let yspeed = 15;
+
+let player1Number = 1;
+let player2Number = 2;
+
+function char1Move() {
+    if (char1Direction ==0) {
+        if (char1Y < canvasHeight) {
+            char1Y += yspeed;
+        }
+    }
+    if (char1Direction ==1) {
+        if (char1X < canvasWidth) {
+            char1X += xspeed;
+        }
+    }
+    if (char1Direction ==2) {
+        if (char1Y > 0) {
+            char1Y -= yspeed;
+        }
+    }
+    if (char1Direction ==3) {
+        if (char1X > 0) {
+            char1X -= xspeed;
+        }
+    }
+    // console.log(charX, charY);
+    char1Dragged();
+}
+function char2Move() {
+    if (char2Direction ==0) {
+        if (char2Y < canvasHeight) {
+            char2Y += yspeed;
+        }
+    }
+    if (char2Direction ==1) {
+        if (char2X < canvasWidth) {
+            char2X += xspeed;
+        }
+    }
+    if (char2Direction ==2) {
+        if (char2Y > 0) {
+            char2Y -= yspeed;
+        }
+    }
+    if (char2Direction ==3) {
+        if (char2X > 0) {
+            char2X -= xspeed;
+        }
+    }
+    // console.log(charX, charY);
+    char2Dragged();
+}
 socket.on("connect", function(){
     console.log("Connection established to server via socket");
 });
@@ -11,7 +71,8 @@ class Grid {
         //you can create an actual grid with 0s and 1s and 2s and so on
         // random grid generator
         this.grid =``;
-        for(let i = 0; i < 64; i++) {
+        this.grid+= `0`;
+        for(let i = 1; i < 64; i++) {
 
             this.grid+=(`${Math.floor(Math.random() * 2)}`);
         }
@@ -59,86 +120,107 @@ function setup() {
 // window.addEventListener("load", ()=>{
        
 // })
-let charX=200;
-let charY=200;
-let d=40;
 
-let xspeed = 5;
-let yspeed = 5;
+let char1Direction = 1;
+let char2Direction = 1;
 
-let charDirection = 1;
 
-function charMove() {
-    if (charDirection ==0) {
-        if (charY < canvasHeight) {
-            charY += yspeed;
-        }
-    }
-    if (charDirection ==1) {
-        if (charX < canvasWidth) {
-            charX += xspeed;
-        }
-    }
-    if (charDirection ==2) {
-        if (charY > 0) {
-            charY -= yspeed;
-        }
-    }
-    if (charDirection ==3) {
-        if (charX > 0) {
-            charX -= xspeed;
-        }
-    }
-    // console.log(charX, charY);
-    charDragged();
-}
   
 function draw() {
     background(220);
     gameGrid.gridDraw(); //draw the grid
     // if (keyIsDown) {
-        if (keyIsDown(DOWN_ARROW)|| key == 's') {
-            charDirection = 0;
-            charMove();
+        if (keyIsPressed){
+            if ((keyCode === DOWN_ARROW)) {
+                char1Direction = 0;
+                char1Move();
+            }
+            else if ((keyCode === LEFT_ARROW)) {
+                char1Direction = 3;
+                char1Move();
+            }
+            else if ((keyCode === RIGHT_ARROW)) {
+                char1Direction = 1;
+                char1Move();
+            }
+            else if ((keyCode === UP_ARROW)) {
+                char1Direction = 2;
+                char1Move();
+            }
+
+            if (key == 's') {
+                char2Direction = 0;
+                char2Move();
+            }
+            else if (key == 'a') {
+                char2Direction = 3;
+                char2Move();
+            }
+            else if (key == 'd') {
+                char2Direction = 1;
+                char2Move();
+            }
+            else if (key == 'w') {
+                char2Direction = 2;
+                char2Move();
+            }
         }
-        else if (keyIsDown(LEFT_ARROW)|| key == 'a') {
-            charDirection = 3;
-            charMove();
-        }
-        else if (keyIsDown(RIGHT_ARROW)|| key == 'd') {
-            charDirection = 1;
-            charMove();
-        }
-        else if (keyIsDown(UP_ARROW)|| key == 'w') {
-            charDirection = 2;
-            charMove();
-        }
-        socket.on("data", function(obj){
+        // else if (keyIsPressed(LEFT_ARROW)|| key == 'a') {
+        //     charDirection = 3;
+        //     charMove();
+        // }
+        // else if (keyIsPressed(RIGHT_ARROW)|| key == 'd') {
+        //     charDirection = 1;
+        //     charMove();
+        // }
+        // else if (keyIsPressed(UP_ARROW)|| key == 'w') {
+        //     charDirection = 2;
+        //     charMove();
+        // }
+        socket.on("serverData", function(obj){
             // console.log(obj);
             drawPaint(obj);
         }) 
     // }
-    ellipse(charX,charY,d);
-    // ellipse(200,200,d);
+    ellipse(char1X,char1Y,d);
+    ellipse(char2X,char2Y,d);
 
 }
 // console.log(charX,charY);
 
-function charDragged() {
+function char1Dragged() {
     let charObj = {
-        x : charX,
-        y : charY
+        player: player1Number,
+        x : char1X,
+        y : char1Y
     };
-    socket.emit('data',charObj);
+    socket.emit('clientData',charObj);
     // console.log(charX);
     // console.log(charY);
 }
-
+function char2Dragged() {
+    let charObj = {
+        player: player2Number,
+        x : char2X,
+        y : char2Y
+    };
+    socket.emit('clientData',charObj);
+    // console.log(charX);
+    // console.log(charY);
+}
 function drawPaint(data) {
     // console.log(data);
     fill(0);
     ellipse(data.x, data.y, d);
-    charX = data.x;
-    charY = data.y;
+    if (data.player == 1) {
+        player1Number = data.player;
+        char1X = data.x;
+        char1Y = data.y;
+    }
+    else {
+        player2Number = data.player;
+        char2X = data.x;
+        char2Y = data.y;    
+    }
     // stroke(255);
 }
