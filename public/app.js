@@ -199,7 +199,7 @@ function draw() {
         // }
         socket.on("serverData", function(obj){
             // console.log(obj);
-            drawPaint(obj);
+            drawChar(obj);
         }) 
     // }
     ellipse(char1X,char1Y,d);
