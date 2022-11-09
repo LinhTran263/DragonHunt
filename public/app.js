@@ -10,26 +10,27 @@ let char2Y=480;
 let d=40;
 let player1Pos;
 let player2Pos;
-let player1Socket;
-let player2Socket;
 
 let xspeed = 8;
 let yspeed = 8;
 
 let bulletSpeed = 2;
 
-let player1Number = 1;
-let player2Number = 2;
-
 let char1Direction = 1;
 let char2Direction = 1;
 
 let gameOn = true;
 let gameGrid; 
+let playerList=[];
 
+
+let tempCounter = 0;
+const distance = (x1, y1, x2, y2) => Math.hypot(x2 - x1, y2 - y1); 
+
+console.log(playerList);
 function charDragged(playerSocket) {
     // let charObj;
-    if (playerSocket == player1Socket) {
+    if (playerSocket == playerList[0]) {
         let charObj = {
             player: 1,
             x : char1X,
@@ -37,7 +38,7 @@ function charDragged(playerSocket) {
         };    
         socket.emit("clientData",charObj);
     }
-    else  {
+    else if (playerSocket == playerList[1]){
         let charObj = {
             player: 2,
             x : char2X,
@@ -50,49 +51,58 @@ function charDragged(playerSocket) {
     // console.log(charY);
 }
 function charMove( playerSocket) {
-    if (playerSocket == player1Socket) {
+    let futureStep;
+    if (playerSocket == playerList[0]) {
         if (char1Direction ==0) {
-            if (char1Y < canvasHeight) {
+            futureStep = gameGrid.getCurrValue(char1X, (char1Y + d/2)); 
+            if (char1Y < canvasHeight && futureStep == 0) {
                 char1Y += yspeed;
             }
         }
         if (char1Direction ==1) {
-            if (char1X < canvasWidth) {
+            futureStep = gameGrid.getCurrValue((char1X + d/2), char1Y); 
+            if (char1X < canvasWidth && futureStep == 0) {
                 char1X += xspeed;
             }
         }
         if (char1Direction ==2) {
-            if (char1Y > 0) {
+            futureStep = gameGrid.getCurrValue(char1X, (char1Y - d/2)); 
+            if (char1Y > 0 && futureStep == 0) {
                 char1Y -= yspeed;
             }
         }
         if (char1Direction ==3) {
-            if (char1X > 0) {
+            futureStep = gameGrid.getCurrValue((char1X - d/2), char1Y); 
+            if (char1X > 0 && futureStep == 0) {
                 char1X -= xspeed;
             }
         }
     }
-    else if (playerSocket == player2Socket) {
+    else if (playerSocket == playerList[1]) {
         if (char2Direction ==0) {
-            if (char2Y < canvasHeight) {
+            futureStep = gameGrid.getCurrValue(char2X, (char2Y + d/2)); 
+            if (char2Y < canvasHeight && futureStep == 0) {
                 char2Y += yspeed;
             }
         }
         if (char2Direction ==1) {
-            if (char2X < canvasWidth) {
+            futureStep = gameGrid.getCurrValue((char2X + d/2), char2Y); 
+            if (char2X < canvasWidth && futureStep == 0) {
                 char2X += xspeed;
             }
         }
         if (char2Direction ==2) {
-            if (char2Y > 0) {
+            futureStep = gameGrid.getCurrValue(char2X, (char2Y - d/2)); 
+            if (char2Y > 0 && futureStep == 0) {
                 char2Y -= yspeed;
             }
         }
         if (char2Direction ==3) {
-            if (char2X > 0) {
+            futureStep = gameGrid.getCurrValue((char2X - d/2), char2Y); 
+            if (char2X > 0 && futureStep == 0) {
                 char2X -= xspeed;
             }
-        }    
+        }  
     }
     else {
         console.log("can't move, not one of the two players");
@@ -103,7 +113,7 @@ function charMove( playerSocket) {
 }
 function keyPressed(){
     if (key == ' '){
-        if (socket.id == player1Socket) {
+        if (socket.id == playerList[0]) {
             let bullet = {
                 x: char1X,
                 y: char1Y,
@@ -113,7 +123,7 @@ function keyPressed(){
             bullets.push(bullet);
             socket.emit("bulletData", bullet);
         } 
-        else if (socket.id == player2Socket) {
+        else if (socket.id == playerList[1]) {
             let bullet = {
                 x: char2X,
                 y: char2Y,
@@ -130,29 +140,44 @@ function keyPressed(){
     } 
 }
 
+
 socket.on("connect", function(){
     console.log("Connection established to server via socket");
-    if (player1Socket == "-1") {
-        player1Socket = socket.id;
-        console.log("this is player 1: ",player1Socket);
+    if (playerList[0] == socket.id) {
+        // player1Socket = socket.id;
+        console.log("this is player 1: ",socket.id);
     }
-    else if (player2Socket == "-1") {
-        player2Socket = socket.id;
-        console.log("this is player 2: ",player2Socket);
+    else if (playerList[1] == socket.id) {
+        // player2Socket = socket.id;
+        console.log("this is player 2: ",socket.id);
     }
-    
+    else {
+        console.log("player is not on list");
+    }
 });
-
+socket.on("playerID", (data)=>{
+    tempCounter++;
+    console.log("PLAYER ID SCOKET HAS RUN", tempCounter);
+    // playerList.push(data);
+    for (let i = 0; i < data.length; i++) {
+        playerList.push(data[i]);
+    }
+    // socket.emit("clientSocket",playerList);
+    // console.log(data);
+});
 class Grid {
     constructor(size, rows, cols) {
         //you can create an actual grid with 0s and 1s and 2s and so on
         // random grid generator
         this.grid =``;
-        this.grid+= `0`;
-        for(let i = 1; i < 64; i++) {
+        // this.grid+= `0`;
+        // for(let i = 1; i < 64; i++) {
 
-            this.grid+=(`${Math.floor(Math.random() * 2)}`);
-        }
+        //     this.grid+=(`${Math.floor(Math.random() * 2)}`);
+        // }
+        socket.on("gridNumbers", (data)=>{
+            this.grid += data;
+        });
         this.grid = this.grid.replace(/\s/g, ""); // IMP : This step removes all the whitespaces in the grid.
         this.size = size;
         this.rows = rows;
@@ -188,69 +213,70 @@ class Grid {
 }
 
 function setup() {
-    player1Socket = "-1";
-    player2Socket = "-1";
+    
     let canvas = createCanvas(canvasWidth, canvasHeight);
     canvas.id = "canvas";
     canvas.parent("game_container");
     gameGrid = new Grid(64, 8,8); //create a new Grid object
+    let tempGrid = ``;
   }
   
 function draw() {
     background(220);
     gameGrid.gridDraw(); //draw the grid
-
+    
     // if (keyIsDown) {
         if (keyIsPressed){
-            if ((keyCode === DOWN_ARROW) || (key == 's')) {
-                if (socket.id == player1Socket) {
+            if ((keyCode === DOWN_ARROW)) {
+                if (socket.id == playerList[0]) {
                     char1Direction = 0;
                     charMove(socket.id);
                 }
-                else if (socket.id == player2Socket) {
+                else if (socket.id == playerList[1]) {
                     char2Direction =0;
                     charMove(socket.id);
                 }
             }
             else if ((keyCode === LEFT_ARROW) || (key == 'a')) {
-                if (socket.id == player1Socket) {
+                if (socket.id == playerList[0]) {
                     char1Direction = 3;
                     charMove(socket.id);
                 }
-                else if (socket.id == player2Socket) {
+                else if (socket.id == playerList[1]) {
                     char2Direction = 3;
                     charMove(socket.id);
                 }
             }
             else if ((keyCode === RIGHT_ARROW) || (key == 'd')) {
-                if (socket.id == player1Socket) {
+                if (socket.id == playerList[0]) {
                     char1Direction = 1;
                     charMove(socket.id);
                 }
-                else if (socket.id == player2Socket) {
+                else if (socket.id == playerList[1]) {
                     char2Direction = 1;
                     charMove(socket.id);
                 }
             }
             else if ((keyCode === UP_ARROW) || (key == 'w')) {
-                if (socket.id == player1Socket) {
+                if (socket.id == playerList[0]) {
                     char1Direction = 2; 
                     charMove(socket.id);      
                 }
-                else if (socket.id == player2Socket) {
+                else if (socket.id == playerList[1]) {
                     char2Direction = 2;
                     charMove(socket.id);
                 }
             }
+
         }
         player1Pos = gameGrid.getCurrValue(char1X, char1Y);
         player2Pos = gameGrid.getCurrValue(char2X, char2Y);
         socket.on("serverData", function(obj){
-            if (socket.id == player1Socket) {
-                drawChar(obj, 1);
+            if (socket.id ==  playerList[0]) {
+                drawChar(obj, socket.id);
             }
-            else if (socket.id == player2Socket) {
-                drawChar(obj, 2);
+            else if (socket.id == playerList[1]) {
+                drawChar(obj, socket.id);
             }
             // console.log(obj);
             
@@ -271,16 +297,17 @@ function draw() {
     for (let bullet of bullets){
         
         // bullet.x += 2;
+        let bulletPos = gameGrid.getCurrValue(bullet.x,bullet.y);
         if (bullet.z == 1){
-            if (bullet.x < canvasWidth) {
+            if (bullet.x < canvasWidth && bulletPos == 0) {
                 bullet.x +=bulletSpeed;
             }
             else {
                 bullet.alive = false;
             }
         }
-        else if (bullet.z == 2){
-            if (bullet.y > 0) {
+        else if (bullet.z == 2 ){
+            if (bullet.y > 0 && bulletPos == 0) {
                 bullet.y -=bulletSpeed;
             }
             else {
@@ -288,7 +315,7 @@ function draw() {
             }
         }
         else if (bullet.z == 3){
-            if (bullet.x > 0) {
+            if (bullet.x > 0 && bulletPos == 0) {
                 bullet.x -=bulletSpeed;
             }
             else {
@@ -296,7 +323,7 @@ function draw() {
             }
         }
         else if(bullet.z == 0){
-            if (bullet.y < canvasHeight) {
+            if (bullet.y < canvasHeight && bulletPos == 0) {
                 bullet.y +=bulletSpeed;
             }
             else {
@@ -320,19 +347,18 @@ function draw() {
             // }
         }
             
-    })  
-
+    });  
 }
 
-function drawChar(data, playerNo) {
+function drawChar(data, playerSocket) {
     // console.log(data);
-    if (playerNo ==1) {
+    if (playerSocket == playerList[0]) {
         // player1Number = data.player;
         char1X = data.x;
         char1Y = data.y;
         
     }
-    else if (playerNo ==2) {
+    else if (playerSocket == playerList[1]) {
         // player2Number = data.player;
         char2X = data.x;
         char2Y = data.y;   

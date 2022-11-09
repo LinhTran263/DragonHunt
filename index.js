@@ -3,6 +3,14 @@ let express = require("express");
 let app = express();
 app.use("/", express.static("public"))
 let playerCount = 0;
+let players = ["-1","-1"];
+
+let grid =``;
+grid+= `0`;
+for(let i = 1; i < 64; i++) {
+    grid+=(`${Math.floor(Math.random() * 2)}`);
+}
+
 
 
 //creating an http server ON the express app
@@ -24,19 +32,35 @@ io.sockets.on("connect", (socket)=>{
     console.log("New Connection: ", socket.id);
     playerCount++;
     console.log("Player Count: ", playerCount);
+    io.sockets.emit("gridNumbers", grid);
 
-    // let playerNo = {
-    //     number: playerNumber
-    // }
-    // socket.emit("playerJoin",playerNo);
-    if (playerCount <= 2) {
+    if (playerCount == 1) {
+        // if (players[0] == "-1") {
+        //     players[0] = socket.id;
+        // }
+        players[0] = socket.id;
+        // players.push(socket.id);
+        io.sockets.emit("playerID", players);
+        
+    }
+    else if (playerCount == 2) {
+        io.sockets.emit("gridNumbers", grid);
+        for (let i = 0; i < players.length; i++) {
+            if (players[i] == "-1") {
+                players[i] = socket.id;
+                break;
+            }
+            
+        }
+        // players.push(socket.id);
+        io.sockets.emit("playerID", players);
         socket.on("clientData", function(data) {
             // console.log(data);
             io.sockets.emit("serverData",data);
         });
-        
-        socket.on("bulletData", function(data) {
-            io.sockets.emit("bulletServer", data);
+
+        socket.on("bulletData", function(bullet) {
+            io.sockets.emit("bulletServer", bullet);
         });
     }
 
@@ -44,7 +68,13 @@ io.sockets.on("connect", (socket)=>{
     
     //when socket is disconneted
     socket.on("disconnect", ()=>{
-        console.log("Socket Disconnected: ", socket.id);
+        for (let i = 0; i < players.length; i++) {
+            if (players[i] == socket.id) {
+                players[i] = "-1";
+                break;
+            }
+        }
+         console.log("Socket Disconnected: ", socket.id);
         playerCount--;
         console.log("Player Count: ", playerCount);
     });
