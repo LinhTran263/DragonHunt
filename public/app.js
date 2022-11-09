@@ -313,63 +313,59 @@ function draw() {
     ellipse(char2X,char2Y,d);
     for (let bullet of bullets){
         
-        // bullet.x += 2;
         let bulletPos = gameGrid.getCurrValue(bullet.x,bullet.y);
         let blockIndex;
         if (bullet.alive) {
             ellipse(bullet.x,bullet.y,10);
-        }
-        if (bulletPos == 0 && bullet.alive) {
-            if (bullet.z == 1){
-                if (bullet.x < canvasWidth) {
-                    bullet.x +=bulletSpeed;
+            if (bulletPos == 0) {
+                if (bullet.z == 1){
+                    if (bullet.x < canvasWidth) {
+                        bullet.x +=bulletSpeed;
+                    }
+                    else {
+                        bullet.alive = false;
+                    }
                 }
-                else {
-                    bullet.alive = false;
+                else if (bullet.z == 2 ){
+                    if (bullet.y > 0) {
+                        bullet.y -=bulletSpeed;
+                    }
+                    else {
+                        bullet.alive = false;
+                    }
+                }
+                else if (bullet.z == 3){
+                    if (bullet.x > 0) {
+                        bullet.x -=bulletSpeed;
+                    }
+                    else {
+                        bullet.alive = false;
+                    }
+                }
+                else if(bullet.z == 0){
+                    if (bullet.y < canvasHeight) {
+                        bullet.y +=bulletSpeed;
+                    }
+                    else {
+                        bullet.alive = false;
+                    }
                 }
             }
-            else if (bullet.z == 2 ){
-                if (bullet.y > 0) {
-                    bullet.y -=bulletSpeed;
+            else {
+                
+                blockIndex = gameGrid.getIndex(bullet.x,bullet.y);
+
+                if (gameGrid.grid[blockIndex] == 1) {
+                    blocksCounter[blockIndex]++;
+                    if (blocksCounter[blockIndex] >2) {
+                        gameGrid.recolorBlock(bullet.x,bullet.y);
+                    } 
                 }
-                else {
-                    bullet.alive = false;
-                }
+                bullet.alive = false;
+                bullets.splice(blockIndex,1);
+                console.log(blocksCounter);
             }
-            else if (bullet.z == 3){
-                if (bullet.x > 0) {
-                    bullet.x -=bulletSpeed;
-                }
-                else {
-                    bullet.alive = false;
-                }
-            }
-            else if(bullet.z == 0){
-                if (bullet.y < canvasHeight) {
-                    bullet.y +=bulletSpeed;
-                }
-                else {
-                    bullet.alive = false;
-                }
-            }
-        }
-        else {
-            bullet.alive = false;
-            blockIndex = gameGrid.getIndex(bullet.x,bullet.y);
-            // console.log(blocksCounter[blockIndex]);
-            console.log(blocksCounter);
-            if (gameGrid.grid[blockIndex] == 1) {
-                if (blocksCounter[blockIndex] > 70) {
-                    gameGrid.recolorBlock(bullet.x,bullet.y);
-                    
-                    // break;
-                } 
-                else {blocksCounter[blockIndex]++;}
-            }
-            bullets.splice(blockIndex,1);
-        }
-        
-        
+        } 
         
     }
     socket.on("bulletServer", (data)=>{
