@@ -7,7 +7,7 @@ let char1X=32;
 let char1Y=32;
 let char2X=480;
 let char2Y=480;
-let d=40;
+let d=50;
 let player1Pos;
 let player2Pos;
 
@@ -24,9 +24,21 @@ let gameGrid;
 let playerList=[];
 let blocksCounter = [];
 
+let ground;
+let blueChar;
+let redChar;
+let villain;
+
 
 let tempCounter = 0;
 const distance = (x1, y1, x2, y2) => Math.hypot(x2 - x1, y2 - y1); 
+
+function preload() {
+    ground = loadImage("images/ground_tile.jpeg");
+    blueChar = loadImage("images/stark_2.png");
+    redChar = loadImage("images/targaryan_2.png");
+    villain = loadImage("images/white_walker.png");
+}
 
 console.log(playerList);
 function charDragged(playerSocket) {
@@ -184,6 +196,7 @@ class Grid {
     gridDraw() {
         //each number in your grid can be a particular element or colour - depends on your game logic
         //loop through the rows and columns and find the grid value at that position in the array
+        
         for (let i = 0; i < this.rows; i++) {
             for (let j = 0; j < this.cols; j++) {
                 //get the grid value - is it 0 or 1
@@ -191,11 +204,14 @@ class Grid {
         
                 // depending on the value, you can give it the appropriate colour/shape/image
                 if (gridVal == 0) {
-                    fill(255);
+                    fill(200);
+                    // background(50);
+                    // image(ground, i * this.size, j * this.size, this.size, this.size);
                     rect(i * this.size, j * this.size, this.size, this.size);
                 } else if (gridVal == 1) {
-                    fill(128);
-                    rect(i * this.size, j * this.size, this.size, this.size);
+                    // fill(128);
+                    image(villain, i * this.size, j * this.size, this.size, this.size)
+                    // rect(i * this.size, j * this.size, this.size, this.size);
                 }
             }
         }
@@ -304,13 +320,14 @@ function draw() {
     } else {
         fill(0);
     }
-    ellipse(char1X,char1Y,d);
+    image(blueChar, char1X - d/2,char1Y - d/2, d,d);
+    // ellipse(char1X,char1Y,d);
     if(player2Pos==1) {
         fill(255,0,0) 
     } else {
         fill(0);
     }
-    ellipse(char2X,char2Y,d);
+    image(redChar, char2X - d/2,char2Y - d/2, d,d);
     for (let bullet of bullets){
         
         let bulletPos = gameGrid.getCurrValue(bullet.x,bullet.y);
