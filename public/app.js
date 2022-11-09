@@ -39,6 +39,9 @@ function char1Move() {
     // console.log(charX, charY);
     char1Dragged();
 }
+
+
+
 function char2Move() {
     if (char2Direction ==0) {
         if (char2Y < canvasHeight) {
@@ -122,15 +125,17 @@ function setup() {
        
 // })
 
-function bulletShoot(){
-    if (keyIsPressed && key == ' '){
-        let bullet = {
-            x: char1X,
-            y: char1Y
-        };
-        bullets.push(bullet);
+function keyPressed(){
+        if (key == ' '){
+            let bullet = {
+                x: char1X,
+                y: char1Y
+            };
+            bullets.push(bullet);
+            socket.emit("bulletData", bullet)
+        }    
+
     }
-}
 
 let char1Direction = 1;
 let char2Direction = 1;
@@ -195,22 +200,25 @@ function draw() {
     // }
     ellipse(char1X,char1Y,d);
     ellipse(char2X,char2Y,d);
-    bulletShoot();
     for (let bullet of bullets){
         ellipse(bullet.x,bullet.y,10);
+        // bullet.x += 2;
         if (char1Direction == 1){
             bullet.x += 2;
         }
         else if (char1Direction == 2){
-            bullet.y += 2;
+            bullet.y -= 2;
         }
         else if (char1Direction == 3){
             bullet.x -= 2;
         }
         else if(char1Direction == 0){
-            bullet.y -=2;
+            bullet.y +=2;
         }
     }
+    socket.on("bulletServer", (data)=>{
+        drawBullet(data);
+    })
 
 }
 // console.log(charX,charY);
@@ -250,4 +258,8 @@ function drawPaint(data) {
         char2Y = data.y;    
     }
     // stroke(255);
+}
+
+function drawBullet(data){
+    ellipse(data.x, data.y,10);
 }
