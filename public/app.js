@@ -28,16 +28,17 @@ let ground;
 let blueChar;
 let redChar;
 let villain;
-
+let fire;
 
 let tempCounter = 0;
 const distance = (x1, y1, x2, y2) => Math.hypot(x2 - x1, y2 - y1); 
 
 function preload() {
-    ground = loadImage("images/ground_tile.jpeg");
+    ground = loadImage("images/sand_tile.jpeg");
     blueChar = loadImage("images/stark_2.png");
     redChar = loadImage("images/targaryan_2.png");
     villain = loadImage("images/white_walker.png");
+    fire = loadImage("images/fire.png");
 }
 
 console.log(playerList);
@@ -206,8 +207,8 @@ class Grid {
                 if (gridVal == 0) {
                     fill(200);
                     // background(50);
-                    // image(ground, i * this.size, j * this.size, this.size, this.size);
-                    rect(i * this.size, j * this.size, this.size, this.size);
+                    image(ground, i * this.size, j * this.size, this.size, this.size);
+                    // rect(i * this.size, j * this.size, this.size, this.size);
                 } else if (gridVal == 1) {
                     // fill(128);
                     image(villain, i * this.size, j * this.size, this.size, this.size)
@@ -333,7 +334,8 @@ function draw() {
         let bulletPos = gameGrid.getCurrValue(bullet.x,bullet.y);
         let blockIndex;
         if (bullet.alive) {
-            ellipse(bullet.x,bullet.y,10);
+            image(fire,bullet.x - 15,bullet.y -15,30,30);
+            // ellipse(bullet.x,bullet.y,10);
             if (bulletPos == 0) {
                 if (bullet.z == 1){
                     if (bullet.x < canvasWidth) {
@@ -415,6 +417,7 @@ function drawChar(data, playerSocket) {
 }
 
 function drawBullet(data){
-    ellipse(data.x, data.y,10);
+    image(fire,data.x-15,data.y-15,30,30);
+    // ellipse(data.x, data.y,10);
     // keyPressed();
 }
