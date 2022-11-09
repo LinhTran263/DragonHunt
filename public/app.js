@@ -8,6 +8,8 @@ let char1Y=32;
 let char2X=480;
 let char2Y=480;
 let d=40;
+let player1Pos;
+let player2Pos;
 
 let xspeed = 15;
 let yspeed = 15;
@@ -111,7 +113,7 @@ class Grid {
     getCurrValue(x, y) {
         let gridX = floor(x / this.size);
         let gridY = floor(y / this.size);
-        console.log(gridX, gridY);
+        // console.log(gridX, gridY);
         return this.grid[gridY * this.cols + gridX];
     }
 }
@@ -149,6 +151,7 @@ let char2Direction = 1;
 function draw() {
     background(220);
     gameGrid.gridDraw(); //draw the grid
+
     // if (keyIsDown) {
         if (keyIsPressed){
             if ((keyCode === DOWN_ARROW)) {
@@ -197,12 +200,26 @@ function draw() {
         //     charDirection = 2;
         //     charMove();
         // }
+        player1Pos = gameGrid.getCurrValue(char1X, char1Y);
+        player2Pos = gameGrid.getCurrValue(char2X, char2Y);
         socket.on("serverData", function(obj){
             // console.log(obj);
             drawChar(obj);
         }) 
     // }
+    if(player1Pos==1) {
+        console.log("grey");
+        fill(255,0,0) 
+    } else {
+        fill(0);
+    }
     ellipse(char1X,char1Y,d);
+    if(player2Pos==1) {
+        console.log("grey");
+        fill(255,0,0) 
+    } else {
+        fill(0);
+    }
     ellipse(char2X,char2Y,d);
     for (let bullet of bullets){
         
@@ -241,7 +258,7 @@ function draw() {
         }
         if (bullet.alive) {
             ellipse(bullet.x,bullet.y,10);
-            console.log(bullet.x,bullet.y);
+            // console.log(bullet.x,bullet.y);
         }
         
     }
@@ -274,21 +291,19 @@ function char2Dragged() {
     // console.log(charX);
     // console.log(charY);
 }
-function drawPaint(data) {
+function drawChar(data) {
     // console.log(data);
-    fill(0);
-    ellipse(data.x, data.y, d);
-    if (data.player == 1) {
+    if (data.player ==1) {
         player1Number = data.player;
         char1X = data.x;
         char1Y = data.y;
+        
     }
-    else {
+    else if (data.player ==2) {
         player2Number = data.player;
         char2X = data.x;
-        char2Y = data.y;    
+        char2Y = data.y;   
     }
-    // stroke(255);
 }
 
 function drawBullet(data){
