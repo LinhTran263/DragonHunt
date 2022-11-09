@@ -12,6 +12,8 @@ let d=40;
 let xspeed = 15;
 let yspeed = 15;
 
+let bulletSpeed = 2;
+
 let player1Number = 1;
 let player2Number = 2;
 
@@ -109,7 +111,7 @@ class Grid {
     getCurrValue(x, y) {
         let gridX = floor(x / this.size);
         let gridY = floor(y / this.size);
-        print(gridX, gridY);
+        console.log(gridX, gridY);
         return this.grid[gridY * this.cols + gridX];
     }
 }
@@ -129,7 +131,9 @@ function keyPressed(){
         if (key == ' '){
             let bullet = {
                 x: char1X,
-                y: char1Y
+                y: char1Y,
+                z: char1Direction,
+                alive: true
             };
             bullets.push(bullet);
             socket.emit("bulletData", bullet)
@@ -201,24 +205,51 @@ function draw() {
     ellipse(char1X,char1Y,d);
     ellipse(char2X,char2Y,d);
     for (let bullet of bullets){
-        ellipse(bullet.x,bullet.y,10);
+        
         // bullet.x += 2;
-        if (char1Direction == 1){
-            bullet.x += 2;
+        if (bullet.z == 1){
+            if (bullet.x < canvasWidth) {
+                bullet.x +=bulletSpeed;
+            }
+            else {
+                bullet.alive = false;
+            }
         }
-        else if (char1Direction == 2){
-            bullet.y -= 2;
+        else if (bullet.z == 2){
+            if (bullet.y > 0) {
+                bullet.y -=bulletSpeed;
+            }
+            else {
+                bullet.alive = false;
+            }
         }
-        else if (char1Direction == 3){
-            bullet.x -= 2;
+        else if (bullet.z == 3){
+            if (bullet.x > 0) {
+                bullet.x -=bulletSpeed;
+            }
+            else {
+                bullet.alive = false;
+            }
         }
-        else if(char1Direction == 0){
-            bullet.y +=2;
+        else if(bullet.z == 0){
+            if (bullet.y < canvasHeight) {
+                bullet.y +=bulletSpeed;
+            }
+            else {
+                bullet.alive = false;
+            }
         }
+        if (bullet.alive) {
+            ellipse(bullet.x,bullet.y,10);
+            console.log(bullet.x,bullet.y);
+        }
+        
     }
     socket.on("bulletServer", (data)=>{
-        drawBullet(data);
+        drawBullet(data);    
     })
+    
+    
 
 }
 // console.log(charX,charY);
@@ -229,7 +260,7 @@ function char1Dragged() {
         x : char1X,
         y : char1Y
     };
-    socket.emit('clientData',charObj);
+    socket.emit("clientData",charObj);
     // console.log(charX);
     // console.log(charY);
 }
@@ -239,7 +270,7 @@ function char2Dragged() {
         x : char2X,
         y : char2Y
     };
-    socket.emit('clientData',charObj);
+    socket.emit("clientData",charObj);
     // console.log(charX);
     // console.log(charY);
 }

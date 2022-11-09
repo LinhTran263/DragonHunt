@@ -36,9 +36,9 @@ io.sockets.on("connect", (socket)=>{
         });
     }
 
-    socket.on("bulletData", (data)=>{
+    socket.on("bulletData", function(data) {
         io.sockets.emit("bulletServer", data);
-    })
+    });
     
     //when socket is disconneted
     socket.on("disconnect", ()=>{
