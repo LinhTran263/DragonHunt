@@ -22,6 +22,7 @@ let char2Direction = 1;
 let gameOn = true;
 let gameGrid; 
 let playerList=[];
+let blocksCounter = [];
 
 
 let tempCounter = 0;
@@ -170,11 +171,6 @@ class Grid {
         //you can create an actual grid with 0s and 1s and 2s and so on
         // random grid generator
         this.grid =``;
-        // this.grid+= `0`;
-        // for(let i = 1; i < 64; i++) {
-
-        //     this.grid+=(`${Math.floor(Math.random() * 2)}`);
-        // }
         socket.on("gridNumbers", (data)=>{
             this.grid += data;
         });
@@ -210,6 +206,11 @@ class Grid {
         // console.log(gridX, gridY);
         return this.grid[gridY * this.cols + gridX];
     }
+    getIndex(x,y) {
+        let gridX = floor(x / this.size);
+        let gridY = floor(y / this.size);
+        return gridY * this.cols + gridX;
+    }
     recolorBlock(x,y) {
         let gridX = floor(x / this.size);
         let gridY = floor(y / this.size);
@@ -232,7 +233,9 @@ function setup() {
     canvas.id = "canvas";
     canvas.parent("game_container");
     gameGrid = new Grid(64, 8,8); //create a new Grid object
-    let tempGrid = ``;
+    for (let j = 0; j < 64; j++) {
+        blocksCounter[j] = 0;
+    }
   }
   
 function draw() {
@@ -312,6 +315,10 @@ function draw() {
         
         // bullet.x += 2;
         let bulletPos = gameGrid.getCurrValue(bullet.x,bullet.y);
+        let blockIndex;
+        if (bullet.alive) {
+            ellipse(bullet.x,bullet.y,10);
+        }
         if (bulletPos == 0 && bullet.alive) {
             if (bullet.z == 1){
                 if (bullet.x < canvasWidth) {
@@ -348,12 +355,21 @@ function draw() {
         }
         else {
             bullet.alive = false;
-            gameGrid.recolorBlock(bullet.x,bullet.y);
+            blockIndex = gameGrid.getIndex(bullet.x,bullet.y);
+            // console.log(blocksCounter[blockIndex]);
+            console.log(blocksCounter);
+            if (gameGrid.grid[blockIndex] == 1) {
+                if (blocksCounter[blockIndex] > 70) {
+                    gameGrid.recolorBlock(bullet.x,bullet.y);
+                    
+                    // break;
+                } 
+                else {blocksCounter[blockIndex]++;}
+            }
+            bullets.splice(blockIndex,1);
         }
         
-        if (bullet.alive) {
-            ellipse(bullet.x,bullet.y,10);
-        }
+        
         
     }
     socket.on("bulletServer", (data)=>{
