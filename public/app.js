@@ -190,17 +190,17 @@ class Grid {
         //loop through the rows and columns and find the grid value at that position in the array
         for (let i = 0; i < this.rows; i++) {
             for (let j = 0; j < this.cols; j++) {
-            //get the grid value - is it 0 or 1
-            let gridVal = this.grid[j * this.rows + i];
-    
-            // depending on the value, you can give it the appropriate colour/shape/image
-            if (gridVal == 0) {
-                fill(255);
-                rect(i * this.size, j * this.size, this.size, this.size);
-            } else if (gridVal == 1) {
-                fill(128);
-                rect(i * this.size, j * this.size, this.size, this.size);
-            }
+                //get the grid value - is it 0 or 1
+                let gridVal = this.grid[j * this.rows + i];
+        
+                // depending on the value, you can give it the appropriate colour/shape/image
+                if (gridVal == 0) {
+                    fill(255);
+                    rect(i * this.size, j * this.size, this.size, this.size);
+                } else if (gridVal == 1) {
+                    fill(128);
+                    rect(i * this.size, j * this.size, this.size, this.size);
+                }
             }
         }
     }
@@ -209,6 +209,20 @@ class Grid {
         let gridY = floor(y / this.size);
         // console.log(gridX, gridY);
         return this.grid[gridY * this.cols + gridX];
+    }
+    recolorBlock(x,y) {
+        let gridX = floor(x / this.size);
+        let gridY = floor(y / this.size);
+        let temp = ``;
+        for (let i = 0; i < gridY * this.cols + gridX; i++) {
+            temp += this.grid[i];
+        }
+        temp+= `0`;
+        for (let i = gridY * this.cols + gridX + 1; i< 64; i++) {
+            temp += this.grid[i];
+        }
+        this.grid = temp;
+
     }
 }
 
@@ -298,41 +312,47 @@ function draw() {
         
         // bullet.x += 2;
         let bulletPos = gameGrid.getCurrValue(bullet.x,bullet.y);
-        if (bullet.z == 1){
-            if (bullet.x < canvasWidth && bulletPos == 0) {
-                bullet.x +=bulletSpeed;
+        if (bulletPos == 0 && bullet.alive) {
+            if (bullet.z == 1){
+                if (bullet.x < canvasWidth) {
+                    bullet.x +=bulletSpeed;
+                }
+                else {
+                    bullet.alive = false;
+                }
             }
-            else {
-                bullet.alive = false;
+            else if (bullet.z == 2 ){
+                if (bullet.y > 0) {
+                    bullet.y -=bulletSpeed;
+                }
+                else {
+                    bullet.alive = false;
+                }
+            }
+            else if (bullet.z == 3){
+                if (bullet.x > 0) {
+                    bullet.x -=bulletSpeed;
+                }
+                else {
+                    bullet.alive = false;
+                }
+            }
+            else if(bullet.z == 0){
+                if (bullet.y < canvasHeight) {
+                    bullet.y +=bulletSpeed;
+                }
+                else {
+                    bullet.alive = false;
+                }
             }
         }
-        else if (bullet.z == 2 ){
-            if (bullet.y > 0 && bulletPos == 0) {
-                bullet.y -=bulletSpeed;
-            }
-            else {
-                bullet.alive = false;
-            }
+        else {
+            bullet.alive = false;
+            gameGrid.recolorBlock(bullet.x,bullet.y);
         }
-        else if (bullet.z == 3){
-            if (bullet.x > 0 && bulletPos == 0) {
-                bullet.x -=bulletSpeed;
-            }
-            else {
-                bullet.alive = false;
-            }
-        }
-        else if(bullet.z == 0){
-            if (bullet.y < canvasHeight && bulletPos == 0) {
-                bullet.y +=bulletSpeed;
-            }
-            else {
-                bullet.alive = false;
-            }
-        }
+        
         if (bullet.alive) {
             ellipse(bullet.x,bullet.y,10);
-            // console.log(bullet.x,bullet.y);
         }
         
     }
