@@ -10,6 +10,8 @@ let char2Y=480;
 let d=40;
 let player1Pos;
 let player2Pos;
+let player1Socket;
+let player2Socket;
 
 let xspeed = 8;
 let yspeed = 8;
@@ -19,59 +21,126 @@ let bulletSpeed = 2;
 let player1Number = 1;
 let player2Number = 2;
 
-function char1Move() {
-    if (char1Direction ==0) {
-        if (char1Y < canvasHeight) {
-            char1Y += yspeed;
+let char1Direction = 1;
+let char2Direction = 1;
+
+let gameOn = true;
+let gameGrid; 
+
+function charDragged(playerSocket) {
+    // let charObj;
+    if (playerSocket == player1Socket) {
+        let charObj = {
+            player: 1,
+            x : char1X,
+            y : char1Y
+        };    
+        socket.emit("clientData",charObj);
+    }
+    else  {
+        let charObj = {
+            player: 2,
+            x : char2X,
+            y : char2Y
+        };
+        socket.emit("clientData",charObj);
+    } 
+    
+    // console.log(charX);
+    // console.log(charY);
+}
+function charMove( playerSocket) {
+    if (playerSocket == player1Socket) {
+        if (char1Direction ==0) {
+            if (char1Y < canvasHeight) {
+                char1Y += yspeed;
+            }
+        }
+        if (char1Direction ==1) {
+            if (char1X < canvasWidth) {
+                char1X += xspeed;
+            }
+        }
+        if (char1Direction ==2) {
+            if (char1Y > 0) {
+                char1Y -= yspeed;
+            }
+        }
+        if (char1Direction ==3) {
+            if (char1X > 0) {
+                char1X -= xspeed;
+            }
         }
     }
-    if (char1Direction ==1) {
-        if (char1X < canvasWidth) {
-            char1X += xspeed;
+    else if (playerSocket == player2Socket) {
+        if (char2Direction ==0) {
+            if (char2Y < canvasHeight) {
+                char2Y += yspeed;
+            }
         }
-    }
-    if (char1Direction ==2) {
-        if (char1Y > 0) {
-            char1Y -= yspeed;
+        if (char2Direction ==1) {
+            if (char2X < canvasWidth) {
+                char2X += xspeed;
+            }
         }
-    }
-    if (char1Direction ==3) {
-        if (char1X > 0) {
-            char1X -= xspeed;
+        if (char2Direction ==2) {
+            if (char2Y > 0) {
+                char2Y -= yspeed;
+            }
         }
+        if (char2Direction ==3) {
+            if (char2X > 0) {
+                char2X -= xspeed;
+            }
+        }    
     }
+    else {
+        console.log("can't move, not one of the two players");
+    }
+    
     // console.log(charX, charY);
-    char1Dragged();
+    charDragged(playerSocket);
+}
+function keyPressed(){
+    if (key == ' '){
+        if (socket.id == player1Socket) {
+            let bullet = {
+                x: char1X,
+                y: char1Y,
+                z: char1Direction,
+                alive: true
+            };
+            bullets.push(bullet);
+            socket.emit("bulletData", bullet);
+        } 
+        else if (socket.id == player2Socket) {
+            let bullet = {
+                x: char2X,
+                y: char2Y,
+                z: char2Direction,
+                alive: true
+            };
+            bullets.push(bullet);
+            socket.emit("bulletData", bullet);    
+        }  
+        else {
+            console.log("neither sockets attached");
+        }
+
+    } 
 }
 
-
-
-function char2Move() {
-    if (char2Direction ==0) {
-        if (char2Y < canvasHeight) {
-            char2Y += yspeed;
-        }
-    }
-    if (char2Direction ==1) {
-        if (char2X < canvasWidth) {
-            char2X += xspeed;
-        }
-    }
-    if (char2Direction ==2) {
-        if (char2Y > 0) {
-            char2Y -= yspeed;
-        }
-    }
-    if (char2Direction ==3) {
-        if (char2X > 0) {
-            char2X -= xspeed;
-        }
-    }
-    // console.log(charX, charY);
-    char2Dragged();
-}
 socket.on("connect", function(){
     console.log("Connection established to server via socket");
+    if (player1Socket == "-1") {
+        player1Socket = socket.id;
+        console.log("this is player 1: ",player1Socket);
+    }
+    else if (player2Socket == "-1") {
+        player2Socket = socket.id;
+        console.log("this is player 2: ",player2Socket);
+    }
+    
 });
 
 class Grid {
@@ -117,36 +186,15 @@ class Grid {
         return this.grid[gridY * this.cols + gridX];
     }
 }
-let gameGrid; 
+
 function setup() {
+    player1Socket = "-1";
+    player2Socket = "-1";
     let canvas = createCanvas(canvasWidth, canvasHeight);
     canvas.id = "canvas";
     canvas.parent("game_container");
     gameGrid = new Grid(64, 8,8); //create a new Grid object
   }
-
-// window.addEventListener("load", ()=>{
-       
-// })
-
-function keyPressed(){
-        if (key == ' '){
-            let bullet = {
-                x: char1X,
-                y: char1Y,
-                z: char1Direction,
-                alive: true
-            };
-            bullets.push(bullet);
-            socket.emit("bulletData", bullet)
-        }    
-
-    }
-
-let char1Direction = 1;
-let char2Direction = 1;
-
-
   
 function draw() {
     background(220);
@@ -154,57 +202,58 @@ function draw() {
 
     // if (keyIsDown) {
         if (keyIsPressed){
-            if ((keyCode === DOWN_ARROW)) {
-                char1Direction = 0;
-                char1Move();
+            if ((keyCode === DOWN_ARROW) || (key == 's')) {
+                if (socket.id == player1Socket) {
+                    char1Direction = 0;
+                    charMove(socket.id);
+                }
+                else if (socket.id == player2Socket) {
+                    char2Direction =0;
+                    charMove(socket.id);
+                }
             }
-            else if ((keyCode === LEFT_ARROW)) {
-                char1Direction = 3;
-                char1Move();
+            else if ((keyCode === LEFT_ARROW) || (key == 'a')) {
+                if (socket.id == player1Socket) {
+                    char1Direction = 3;
+                    charMove(socket.id);
+                }
+                else if (socket.id == player2Socket) {
+                    char2Direction = 3;
+                    charMove(socket.id);
+                }
             }
-            else if ((keyCode === RIGHT_ARROW)) {
-                char1Direction = 1;
-                char1Move();
+            else if ((keyCode === RIGHT_ARROW) || (key == 'd')) {
+                if (socket.id == player1Socket) {
+                    char1Direction = 1;
+                    charMove(socket.id);
+                }
+                else if (socket.id == player2Socket) {
+                    char2Direction = 1;
+                    charMove(socket.id);
+                }
             }
-            else if ((keyCode === UP_ARROW)) {
-                char1Direction = 2;
-                char1Move();
-            }
-
-            if (key == 's') {
-                char2Direction = 0;
-                char2Move();
-            }
-            else if (key == 'a') {
-                char2Direction = 3;
-                char2Move();
-            }
-            else if (key == 'd') {
-                char2Direction = 1;
-                char2Move();
-            }
-            else if (key == 'w') {
-                char2Direction = 2;
-                char2Move();
+            else if ((keyCode === UP_ARROW) || (key == 'w')) {
+                if (socket.id == player1Socket) {
+                    char1Direction = 2; 
+                    charMove(socket.id);      
+                }
+                else if (socket.id == player2Socket) {
+                    char2Direction = 2;
+                    charMove(socket.id);
+                }
             }
         }
-        // else if (keyIsPressed(LEFT_ARROW)|| key == 'a') {
-        //     charDirection = 3;
-        //     charMove();
-        // }
-        // else if (keyIsPressed(RIGHT_ARROW)|| key == 'd') {
-        //     charDirection = 1;
-        //     charMove();
-        // }
-        // else if (keyIsPressed(UP_ARROW)|| key == 'w') {
-        //     charDirection = 2;
-        //     charMove();
-        // }
         player1Pos = gameGrid.getCurrValue(char1X, char1Y);
         player2Pos = gameGrid.getCurrValue(char2X, char2Y);
         socket.on("serverData", function(obj){
+            if (socket.id == player1Socket) {
+                drawChar(obj, 1);
+            }
+            else if (socket.id == player2Socket) {
+                drawChar(obj, 2);
+            }
             // console.log(obj);
-            drawChar(obj);
+            
         }) 
     // }
     if(player1Pos==1) {
@@ -264,48 +313,27 @@ function draw() {
         for (let bullet of bullets){
             if (bullet.alive) {
                 drawBullet(data);
-                console.log(data);
+                // console.log(data);
             }
-            else {
-                bullets.remove(bullet);
-            }
+            // else {
+            //     bullets.remove(bullet);
+            // }
         }
             
     })  
 
 }
-// console.log(charX,charY);
 
-function char1Dragged() {
-    let charObj = {
-        player: player1Number,
-        x : char1X,
-        y : char1Y
-    };
-    socket.emit("clientData",charObj);
-    // console.log(charX);
-    // console.log(charY);
-}
-function char2Dragged() {
-    let charObj = {
-        player: player2Number,
-        x : char2X,
-        y : char2Y
-    };
-    socket.emit("clientData",charObj);
-    // console.log(charX);
-    // console.log(charY);
-}
-function drawChar(data) {
+function drawChar(data, playerNo) {
     // console.log(data);
-    if (data.player ==1) {
-        player1Number = data.player;
+    if (playerNo ==1) {
+        // player1Number = data.player;
         char1X = data.x;
         char1Y = data.y;
         
     }
-    else if (data.player ==2) {
-        player2Number = data.player;
+    else if (playerNo ==2) {
+        // player2Number = data.player;
         char2X = data.x;
         char2Y = data.y;   
     }
@@ -313,4 +341,5 @@ function drawChar(data) {
 
 function drawBullet(data){
     ellipse(data.x, data.y,10);
+    // keyPressed();
 }

@@ -34,11 +34,13 @@ io.sockets.on("connect", (socket)=>{
             // console.log(data);
             io.sockets.emit("serverData",data);
         });
+        
+        socket.on("bulletData", function(data) {
+            io.sockets.emit("bulletServer", data);
+        });
     }
 
-    socket.on("bulletData", function(data) {
-        io.sockets.emit("bulletServer", data);
-    });
+    
     
     //when socket is disconneted
     socket.on("disconnect", ()=>{
