@@ -1,6 +1,7 @@
 let socket = io();
 let canvasWidth = 512;
 let canvasHeight = 512;
+let bullets = [];
 
 let char1X=32;
 let char1Y=32;
@@ -121,6 +122,16 @@ function setup() {
        
 // })
 
+function bulletShoot(){
+    if (keyIsPressed && key == ' '){
+        let bullet = {
+            x: char1X,
+            y: char1Y
+        };
+        bullets.push(bullet);
+    }
+}
+
 let char1Direction = 1;
 let char2Direction = 1;
 
@@ -184,6 +195,22 @@ function draw() {
     // }
     ellipse(char1X,char1Y,d);
     ellipse(char2X,char2Y,d);
+    bulletShoot();
+    for (let bullet of bullets){
+        ellipse(bullet.x,bullet.y,10);
+        if (char1Direction == 1){
+            bullet.x += 2;
+        }
+        else if (char1Direction == 2){
+            bullet.y += 2;
+        }
+        else if (char1Direction == 3){
+            bullet.x -= 2;
+        }
+        else if(char1Direction == 0){
+            bullet.y -=2;
+        }
+    }
 
 }
 // console.log(charX,charY);
