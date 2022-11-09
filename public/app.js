@@ -11,8 +11,8 @@ let d=40;
 let player1Pos;
 let player2Pos;
 
-let xspeed = 15;
-let yspeed = 15;
+let xspeed = 8;
+let yspeed = 8;
 
 let bulletSpeed = 2;
 
@@ -208,14 +208,12 @@ function draw() {
         }) 
     // }
     if(player1Pos==1) {
-        console.log("grey");
         fill(255,0,0) 
     } else {
         fill(0);
     }
     ellipse(char1X,char1Y,d);
     if(player2Pos==1) {
-        console.log("grey");
         fill(255,0,0) 
     } else {
         fill(0);
@@ -263,10 +261,17 @@ function draw() {
         
     }
     socket.on("bulletServer", (data)=>{
-        drawBullet(data);    
-    })
-    
-    
+        for (let bullet of bullets){
+            if (bullet.alive) {
+                drawBullet(data);
+                console.log(data);
+            }
+            else {
+                bullets.remove(bullet);
+            }
+        }
+            
+    })  
 
 }
 // console.log(charX,charY);
