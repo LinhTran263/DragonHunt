@@ -7,10 +7,10 @@ let players = ["-1","-1"];
 
 let grid =``;
 grid+= `0`;
-for(let i = 1; i < 64; i++) {
+for(let i = 1; i < 63; i++) {
     grid+=(`${Math.floor(Math.random() * 2)}`);
 }
-
+grid+= `0`;
 
 
 //creating an http server ON the express app

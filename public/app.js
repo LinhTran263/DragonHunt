@@ -55,25 +55,25 @@ function charMove( playerSocket) {
     if (playerSocket == playerList[0]) {
         if (char1Direction ==0) {
             futureStep = gameGrid.getCurrValue(char1X, (char1Y + d/2)); 
-            if (char1Y < canvasHeight && futureStep == 0) {
+            if (char1Y+d/2 < canvasHeight && futureStep == 0) {
                 char1Y += yspeed;
             }
         }
         if (char1Direction ==1) {
             futureStep = gameGrid.getCurrValue((char1X + d/2), char1Y); 
-            if (char1X < canvasWidth && futureStep == 0) {
+            if (char1X+d/2 < canvasWidth && futureStep == 0) {
                 char1X += xspeed;
             }
         }
         if (char1Direction ==2) {
             futureStep = gameGrid.getCurrValue(char1X, (char1Y - d/2)); 
-            if (char1Y > 0 && futureStep == 0) {
+            if (char1Y-d/2 > 0 && futureStep == 0) {
                 char1Y -= yspeed;
             }
         }
         if (char1Direction ==3) {
             futureStep = gameGrid.getCurrValue((char1X - d/2), char1Y); 
-            if (char1X > 0 && futureStep == 0) {
+            if (char1X-d/2 > 0 && futureStep == 0) {
                 char1X -= xspeed;
             }
         }
@@ -81,25 +81,25 @@ function charMove( playerSocket) {
     else if (playerSocket == playerList[1]) {
         if (char2Direction ==0) {
             futureStep = gameGrid.getCurrValue(char2X, (char2Y + d/2)); 
-            if (char2Y < canvasHeight && futureStep == 0) {
+            if (char2Y +d/2 < canvasHeight && futureStep == 0) {
                 char2Y += yspeed;
             }
         }
         if (char2Direction ==1) {
             futureStep = gameGrid.getCurrValue((char2X + d/2), char2Y); 
-            if (char2X < canvasWidth && futureStep == 0) {
+            if (char2X +d/2< canvasWidth && futureStep == 0) {
                 char2X += xspeed;
             }
         }
         if (char2Direction ==2) {
             futureStep = gameGrid.getCurrValue(char2X, (char2Y - d/2)); 
-            if (char2Y > 0 && futureStep == 0) {
+            if (char2Y -d/2> 0 && futureStep == 0) {
                 char2Y -= yspeed;
             }
         }
         if (char2Direction ==3) {
             futureStep = gameGrid.getCurrValue((char2X - d/2), char2Y); 
-            if (char2X > 0 && futureStep == 0) {
+            if (char2X -d/2> 0 && futureStep == 0) {
                 char2X -= xspeed;
             }
         }  
